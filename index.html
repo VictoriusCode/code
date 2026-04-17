@@ -86,11 +86,33 @@
       width:250px;
       border-radius:15px;
       transition:0.4s;
+      position:relative;
     }
 
     .card:hover {
       transform:rotateX(8deg) rotateY(8deg) scale(1.05);
       box-shadow:0 0 30px #00f0ff;
+    }
+
+    /* NEW card glow scan */
+    .card::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:15px;
+      background:linear-gradient(120deg, transparent, #00f0ff, transparent);
+      opacity:0;
+      transition:0.5s;
+    }
+
+    .card:hover::before {
+      opacity:0.2;
+      animation:scan 2s linear infinite;
+    }
+
+    @keyframes scan {
+      from { transform:translateX(-100%); }
+      to { transform:translateX(100%); }
     }
 
     .cta-btn {
@@ -140,16 +162,96 @@
       font-size:0.9rem;
       opacity:0.6;
     }
+
+    /* NEW cursor glow */
+    .cursor-glow {
+      position:fixed;
+      width:300px;
+      height:300px;
+      background:radial-gradient(circle, rgba(0,240,255,0.15), transparent 60%);
+      pointer-events:none;
+      transform:translate(-50%,-50%);
+      z-index:999;
+      mix-blend-mode:screen;
+    }
+
+    /* NEW glitch */
+    .glitch {
+      position:relative;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content:attr(data-text);
+      position:absolute;
+      left:0;
+      width:100%;
+    }
+
+    .glitch::before {
+      color:#00f0ff;
+      z-index:-1;
+      animation:glitchTop 2s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+      color:#ff00c8;
+      z-index:-2;
+      animation:glitchBottom 2s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitchTop {
+      0% { transform:translate(0); }
+      50% { transform:translate(-2px,2px); }
+      100% { transform:translate(0); }
+    }
+
+    @keyframes glitchBottom {
+      0% { transform:translate(0); }
+      50% { transform:translate(2px,-2px); }
+      100% { transform:translate(0); }
+    }
+
+    /* NEW particles */
+    .particle {
+      position:absolute;
+      width:4px;
+      height:4px;
+      background:#00f0ff;
+      border-radius:50%;
+      opacity:0.5;
+      animation:float 10s linear infinite;
+    }
+
+    @keyframes float {
+      from { transform:translateY(0); opacity:0.5; }
+      to { transform:translateY(-100vh); opacity:0; }
+    }
+
+    /* NEW section fade */
+    section::after {
+      content:"";
+      position:absolute;
+      bottom:0;
+      left:0;
+      width:100%;
+      height:120px;
+      background:linear-gradient(to bottom, transparent, #0a0a0a);
+    }
+
   </style>
 </head>
 
 <body>
 
 <div class="progress-bar"></div>
+<div class="cursor-glow"></div>
 
 <section class="hero">
   <div>
-    <h1 class="hidden">Victorius <span>Code</span></h1>
+    <h1 class="hidden glitch" data-text="Victorius Code">
+      Victorius <span>Code</span>
+    </h1>
     <p class="hidden">I build systems with precision, power, and control.</p>
   </div>
 </section>
@@ -222,6 +324,45 @@ window.addEventListener('scroll',()=>{
   const scrolled = window.scrollY;
   document.querySelectorAll('h2').forEach(el=>{
     el.style.transform = `translateY(${scrolled * 0.1}px)`;
+  });
+});
+
+/* NEW cursor glow */
+const glow = document.querySelector('.cursor-glow');
+window.addEventListener('mousemove', (e) => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+
+/* NEW particles */
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.animationDuration = (5 + Math.random() * 10) + 's';
+
+    document.body.appendChild(p);
+  }
+}
+createParticles();
+
+/* NEW magnetic buttons */
+const buttons = document.querySelectorAll('.cta-btn');
+
+buttons.forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.1)`;
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0,0) scale(1)';
   });
 });
 
